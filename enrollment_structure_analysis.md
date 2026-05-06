@@ -58,3 +58,24 @@ Constants and sample data should be separated from the main backend logic. The J
 ## Implementation Prompt To Use Later
 
 Please refactor my student enrollment backend into a simple layered object-oriented design. Create a config/constants section or file, an EnrollmentDatabase class for SQLite connection, table creation, seed data, SELECT queries, INSERT, and UPDATE logic, and an EnrollmentService class for enrollment-key validation, student enrollment actions, soft unenrollment, and summary counting. Keep the JSON snapshot export separate from the service and database classes. Keep the terminal runner separate from the backend classes. Do not add UI features. Make sure the behavior stays the same as the original starter code.
+Implement the approved backend refactor plan for my student enrollment backend project.
+
+Refactor the current procedural backend into a simple object-oriented layered design while keeping the original behavior the same.
+
+Create a simple structure with:
+1. Constants/config for DB_PATH, SNAPSHOT_PATH, CURRENT_STUDENT, statuses, AVAILABLE_COURSE_KEYS, and SAMPLE_ENROLLMENTS.
+2. An EnrollmentDatabase class for SQLite connection, table creation, seed data, SELECT queries, INSERT, UPDATE, and returning rows.
+3. An EnrollmentService class for enrollment-key validation, enroll-with-key behavior, soft unenrollment, and student summary counting.
+4. A separate JSON snapshot export function.
+5. A small runner that tests the same original workflow.
+
+What you should protect:
+Keep enrollment-key logic in the service layer.
+Keep summary/counting logic in the service layer.
+Keep the database focused on SQLite queries and returning rows.
+Keep soft unenroll as a status update, not a row deletion.
+Keep the JSON snapshot export so students can inspect seeded database data.
+Do not build the Streamlit UI in this session.
+Do not add authentication or session state.
+Do not change the original backend behavior.
+Keep the code beginner-friendly and close to the original classroom style.
