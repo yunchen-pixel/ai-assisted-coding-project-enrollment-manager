@@ -1,0 +1,18 @@
+# Enrollment Structure Analysis
+
+| Structural Issue | Example From My Code | Why It Is a Problem | Suggested Future Layer |
+|---|---|---|---|
+| Constants and configuration are mixed into the main backend file | DB_PATH, SNAPSHOT_PATH, CURRENT_STUDENT, statuses, and course key lists are all stored near the top of the same file | This makes the file harder to manage as the project grows. If paths, statuses, or sample data change, they are mixed with the actual backend logic | Constants/Config |
+| Database setup and database queries are mixed with other responsibilities | connect, create_tables, seed_sample_data, get_available_course_keys, get_course_by_key, and get_student_enrollments all directly use SQLite | These functions belong together, but they should be separated from service logic so the database layer has one clear responsibility | Database Class |
+| Some functions combine business rules and database updates | enroll_with_key checks user_id, email, enrollment_key, finds the course, inserts or updates enrollment status, and returns a record | This is a cross-layer problem because one function is doing validation, enrollment decision-making, and database writing. This can make the function harder to test and change later | Needs Splitting |
+| Soft unenrollment mixes service meaning with database update | soft_unenroll_student changes the status to unenrolled instead of deleting the record | The database update is simple, but the decision to keep history by using status is a service-level rule. This should be clearer in a service layer | Needs Splitting |
+| Summary logic depends on enrollment history | get_student_summary calls get_student_enrollment_history and counts enrolled and unenrolled records | This is service-level behavior because it explains what the data means instead of just reading rows from the database | Service Class |
+| JSON export combines reading database data and writing an output file | export_database_snapshot collects current student, course keys, and enrollment records, then writes a JSON file | This mixes data access with export/reporting responsibility. If the export format changes, it could affect backend database logic | Needs Splitting |
+| The main runner is mixed with backend behavior | main creates tables, seeds data, prints student information, enrolls a student, shows summary, and exports a snapshot | This is useful for testing, but it should not stay mixed with the main backend logic. It should become a separate runner or test flow | Needs Splitting |
+| SQL statements are spread across many functions | SELECT, INSERT, UPDATE, JOIN, and table creation SQL are written directly inside multiple functions | This can make future changes harder because database details are scattered. A database class would make the backend easier to maintain | Database Class |
+
+## Most Important Findings
+
+The current backend works, but it is too procedural and mixed together. The biggest issue is that some functions are doing more than one kind of work. For example, enroll_with_key is not only updating the database. It also checks inputs, finds the course, applies the enrollment rule, and decides how to reactivate a student. This should be split later so a service class handles the enrollment logic and a database class handles the SQL work.
+
+The cleanest future design would separate the project into constants/config, a database class, a service class, and a small runner or test file. The database class should focus on SQLite connections, tables, queries, inserts, and updates. The service class should focus on enrollment rules, summaries, and student actions. Constants such as paths, statuses, and sample course keys should be moved out of the main logic.
